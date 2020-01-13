@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Eclectic Flowers</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display&display=swap" rel="stylesheet">
+    <style>
+        /*
+            #F1A7F1
+            #FAD0C4
+            #CAA9C2
+            #C496A9
+            #414E88
+        */
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #fad0c4;
+            background-image: linear-gradient(315deg, #fad0c4 0%, #f1a7f1 74%);
+            font-family: 'Playfair Display', serif;
+            height: 100%;
+        }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-weight: normal;
+            font-size: 60px;
+            margin: 1rem 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            height: 100%;
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .products a {
+            width: 50%;
+            overflow: hidden;
+            transition: opacity 0.1s ease-in-out;
+            padding: 1rem;
+            opacity: 0.6;
+        }
+        .products a:hover {
+            opacity: 0.5;
+        }
+        .products img {
+            max-width: 100%;
+            display: block;
+            width: 100%;
+            height: 280px;
+            border-radius: 10px;
+        }
+        p {
+            line-height: 1.55;
+            max-width: 700px;
+            margin: 2rem auto;
+            font-size: 20px;
+        }
+        /* kindly-chat overrides */
+        /*.chat-container {*/
+        /*    z-index: 9999999;*/
+        /*}*/
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Eclectic Flowers</h1>
+        <div class="products">
+            <a href="#">
+                <img src="https://pixabay.com/get/57e9d2404e51b10ff3d89938c32b34781422dfe05459784d732f79dd/flower-197343_640.jpg" alt="flowers"/>
+            </a>
+            <a href="#">
+                <img src="https://pixabay.com/get/54e5d640495aa514f1dc8460822c347d133ec3e456567940712a72dd90/pink-roses-2533389_640.jpg" alt="flowers"/>
+            </a>
+            <a href="#">
+                <img src="https://pixabay.com/get/57e1d6474b52af14f1dc8460822c347d133ec3e45656794071297bd59e/tulips-1134103_640.jpg" alt="flowers"/>
+            </a>
+            <a href="#">
+                <img src="https://pixabay.com/get/54e0d34b4c5bae14f1dc8460822c347d133ec3e456567940712a72dc94/tulips-2068692_640.jpg" alt="flowers"/>
+            </a>
+        </div>
+        <div>
+            <p><a href="#" id="takover-button">Lorem ipsum</a> dolor sit amet, consectetur adipiscing elit. Aenean finibus consequat lacus eget luctus. Nam in ultricies ex. Integer sagittis bibendum enim, vitae congue tellus. Nullam justo augue, aliquet vel elementum nec, bibendum maximus arcu. Phasellus sit amet imperdiet eros. Vestibulum eleifend egestas odio posuere consequat. Fusce cursus congue augue, ac luctus massa. Maecenas et ipsum erat. Morbi ultrices eros at pellentesque dignissim. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean ac odio sed urna finibus volutpat.</p>
+        </div>
+    </div>
+    <script>
+        /* Zendesk Chat Widget settings */
+        window.zESettings = {
+            webWidget: {
+                color: { theme: '#f1a7f1' },
+                offset: {
+                    horizontal: '80px',
+                    vertical: '10px'
+                },
+                 zIndex: 999  // kindly-chat is @ z-index: 1000
+            }
+        };
+    </script>
+    <script id="kindly-chat" src="https://chat.kindlycdn.com/kindly-chat.js" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
+    <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ce3e09dc-df8e-4c48-bf3a-46a0c28a1bbc"></script>
+    <script>
+        // References:
+        // - https://developer.zendesk.com/embeddables/docs/widget/core
+        // - https://developer.zendesk.com/embeddables/docs/widget/chat
+        // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
+
+        function botChatLog() {
+          return 'Bot chat history:\n' +
+          '2020-01-01 22:00 Nikolai: Kan jeg kjøpe blomstr?\n' +
+          '2020-01-01 22:00 Eclectic Flowers: Hos oss kan du kjøpe manage flotte blomster i duse pastellfarger! 💐💐💐💐\n' +
+          '2020-01-01 22:02 Nikolai: Takk\n' +
+          '2020-01-01 22:02 Eclectic Flowers: Ingenting å takke for! Håper du fikk svar på det du lurte på\n' +
+          '2020-01-01 22:02 Nikolai: Forresten, hva heter Tussilago farfara på norsk?\n' +
+          '2020-01-01 22:03 Eclectic Flowers: Nå skjønte jeg ikke. Vil du snakke med et menneske?\n' +
+          '2020-01-01 22:03 Nikolai: Snakk med et menneske';
+        }
+
+        /* Hidden by default */
+        zE('webWidget', 'hide');
+
+        /* On takeover click open zendesk bubble */
+        // TODO: button click API in kindly-chat
+        const takeoverButton = document.getElementById('takover-button');
+            takeoverButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            // TODO: get chat log
+            // TODO: send formatted chat message
+            const displayState = zE('webWidget:get', 'display');
+            console.log('displayState',displayState);
+            if(displayState !== 'chat') {
+                console.log('opening web widget');
+                zE('webWidget', 'show');
+                zE('webWidget', 'open');
+
+                zE('webWidget', 'chat:send', botChatLog());
+            }
+        });
+
+        zE('webWidget:on', 'chat:start', () => {
+            console.log('chat started!')
+        });
+        /* On takeover end, open kindly-chat */
+        zE('webWidget:on', 'chat:end', () => {
+            console.log('chat session ended, open bot chat');
+        });
+    </script>
+</body>
+</html>
