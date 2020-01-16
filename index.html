@@ -20,12 +20,15 @@
             background-color: #fad0c4;
             background-image: linear-gradient(315deg, #fad0c4 0%, #f1a7f1 74%);
             font-family: 'Playfair Display', serif;
-            height: 100%;
         }
         html,
         body {
             margin: 0;
             padding: 0;
+        }
+        a {
+            color: #414E88;
+            text-decoration: none;
         }
         h1 {
             font-weight: normal;
@@ -36,7 +39,7 @@
         .container {
             max-width: 1024px;
             margin: 0 auto;
-            height: 100%;
+            height: 100vh;
         }
         .products {
             display: flex;
@@ -44,7 +47,7 @@
             justify-content: center;
         }
         .products a {
-            width: 50%;
+            width: 33.33%;
             overflow: hidden;
             transition: opacity 0.1s ease-in-out;
             padding: 1rem;
@@ -57,7 +60,6 @@
             max-width: 100%;
             display: block;
             width: 100%;
-            height: 280px;
             border-radius: 10px;
         }
         p {
@@ -77,22 +79,21 @@
         <h1>Eclectic Flowers</h1>
         <div class="products">
             <a href="#">
-                <img src="https://pixabay.com/get/57e9d2404e51b10ff3d89938c32b34781422dfe05459784d732f79dd/flower-197343_640.jpg" alt="flowers"/>
+                <img src="./img/chrysanthemum-202483_640.jpg" alt="flowers"/>
             </a>
             <a href="#">
-                <img src="https://pixabay.com/get/54e5d640495aa514f1dc8460822c347d133ec3e456567940712a72dd90/pink-roses-2533389_640.jpg" alt="flowers"/>
+                <img src="./img/tulips-3339416_640.jpg" alt="flowers"/>
             </a>
             <a href="#">
-                <img src="https://pixabay.com/get/57e1d6474b52af14f1dc8460822c347d133ec3e45656794071297bd59e/tulips-1134103_640.jpg" alt="flowers"/>
-            </a>
-            <a href="#">
-                <img src="https://pixabay.com/get/54e0d34b4c5bae14f1dc8460822c347d133ec3e456567940712a72dc94/tulips-2068692_640.jpg" alt="flowers"/>
+                <img src="./img/hydrangea-3659614_640.jpg" alt="flowers"/>
             </a>
         </div>
         <div>
             <p><a href="#" id="takover-button">Lorem ipsum</a> dolor sit amet, consectetur adipiscing elit. Aenean finibus consequat lacus eget luctus. Nam in ultricies ex. Integer sagittis bibendum enim, vitae congue tellus. Nullam justo augue, aliquet vel elementum nec, bibendum maximus arcu. Phasellus sit amet imperdiet eros. Vestibulum eleifend egestas odio posuere consequat. Fusce cursus congue augue, ac luctus massa. Maecenas et ipsum erat. Morbi ultrices eros at pellentesque dignissim. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean ac odio sed urna finibus volutpat.</p>
         </div>
     </div>
+
+
     <script>
         /* Zendesk Chat Widget settings */
         window.zESettings = {
@@ -116,22 +117,23 @@
 
         function botChatLog() {
           return 'Bot chat history:\n' +
-          '2020-01-01 22:00 Nikolai: Kan jeg kjøpe blomstr?\n' +
-          '2020-01-01 22:00 Eclectic Flowers: Hos oss kan du kjøpe manage flotte blomster i duse pastellfarger! 💐💐💐💐\n' +
-          '2020-01-01 22:02 Nikolai: Takk\n' +
-          '2020-01-01 22:02 Eclectic Flowers: Ingenting å takke for! Håper du fikk svar på det du lurte på\n' +
-          '2020-01-01 22:02 Nikolai: Forresten, hva heter Tussilago farfara på norsk?\n' +
-          '2020-01-01 22:03 Eclectic Flowers: Nå skjønte jeg ikke. Vil du snakke med et menneske?\n' +
-          '2020-01-01 22:03 Nikolai: Snakk med et menneske';
+          '22:00 Nikolai: Kan jeg kjøpe blomstr?\n' +
+          '22:00 Eclectic Flowers: Hos oss kan du kjøpe manage flotte blomster i duse pastellfarger! 💐💐💐💐\n' +
+          '22:02 Nikolai: Takk\n' +
+          '22:02 Eclectic Flowers: Ingenting å takke for! Håper du fikk svar på det du lurte på\n' +
+          '22:02 Nikolai: Forresten, hva heter Tussilago farfara på norsk?\n' +
+          '22:03 Eclectic Flowers: Nå skjønte jeg ikke. Vil du snakke med et menneske?\n' +
+          '22:03 Nikolai: Snakk med et menneske';
         }
 
         /* Hidden by default */
+        // TODO: only run if not already shown
         zE('webWidget', 'hide');
 
         /* On takeover click open zendesk bubble */
         // TODO: button click API in kindly-chat
         const takeoverButton = document.getElementById('takover-button');
-            takeoverButton.addEventListener('click', (e) => {
+            takeoverButton.addEventListener('click', (e, button, chatMessage, chat) => {
             e.preventDefault();
             // TODO: get chat log
             // TODO: send formatted chat message
@@ -149,10 +151,7 @@
         zE('webWidget:on', 'chat:start', () => {
             console.log('chat started!')
         });
-        /* On takeover end, open kindly-chat */
-        zE('webWidget:on', 'chat:end', () => {
-            console.log('chat session ended, open bot chat');
-        });
+        /* On takeover end, open kindly-chat? */
     </script>
 </body>
 </html>
