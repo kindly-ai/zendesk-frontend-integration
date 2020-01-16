@@ -1,13 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Eclectic Flowers</title>
+    <title>Eclectic Flowers - About</title>
     <meta charset="utf-8">
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display&display=swap" rel="stylesheet">
     <style>
         /*
-            colors: #F1A7F1 #FAD0C4 #CAA9C2 #C496A9 #414E88
+            #F1A7F1
+            #FAD0C4
+            #CAA9C2
+            #C496A9
+            #414E88
         */
         * {
             box-sizing: border-box;
@@ -73,24 +77,16 @@
 <body>
     <div class="container">
         <h1>Eclectic Flowers</h1>
-        <div class="products">
-            <a href="#">
-                <img src="./img/chrysanthemum-202483_640.jpg" alt="flowers"/>
-            </a>
-            <a href="#">
-                <img src="./img/tulips-3339416_640.jpg" alt="flowers"/>
-            </a>
-            <a href="#">
-                <img src="./img/hydrangea-3659614_640.jpg" alt="flowers"/>
-            </a>
-        </div>
         <div>
             <p>
-                <a href="about.html">About Eclectic Flowers</a>.<br><br>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean finibus consequat lacus eget luctus. Nam in ultricies ex. Integer sagittis bibendum enim, vitae congue tellus. Nullam justo augue, aliquet vel elementum nec, bibendum maximus arcu. Phasellus sit amet imperdiet eros. Vestibulum eleifend egestas odio posuere consequat. Fusce cursus congue augue, ac luctus massa. Maecenas et ipsum erat. Morbi ultrices eros at pellentesque dignissim. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean ac odio sed urna finibus volutpat.</p>
+                <strong>About</strong><br>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean finibus consequat lacus eget luctus. Nam in ultricies ex. Integer sagittis bibendum enim, vitae congue tellus<br>
+                <a href="/" id="back">Back</a>
+            </p>
         </div>
     </div>
 
+    <!-- This is copied from index.html --->
     <script>
       /* Format chat log */
       function formatChat(messages) {
@@ -116,14 +112,14 @@
       }
       /* Zendesk Chat Widget settings */
       window.zESettings = {
-        webWidget: {
-          color: { theme: '#f1a7f1' },
-          offset: {
-            horizontal: '80px',
-            vertical: '10px'
-          },
-          // zIndex: 999  // kindly-chat is @ z-index: 1000
-        }
+          webWidget: {
+              color: { theme: '#f1a7f1' },
+              offset: {
+                  horizontal: '80px',
+                  vertical: '10px'
+              },
+               // zIndex: 999  // kindly-chat is @ z-index: 1000
+          }
       };
 
       // Check if manual chat has been started
@@ -140,6 +136,7 @@
             window.kindlyChat.hideBubble();
 
             if (displayState !== 'chat') {  // Do nothing if chat is already open
+
               localStorage.setItem('startedManualChat', "true");
               zE('webWidget', 'show');
               zE('webWidget', 'open');
@@ -157,22 +154,27 @@
     <script id="kindly-chat" src="https://chat-dev.kindlycdn.com/kindly-chat.js?yo=lo" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
     <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ce3e09dc-df8e-4c48-bf3a-46a0c28a1bbc"></script>
     <script>
-      // References:
-      // - https://developer.zendesk.com/embeddables/docs/widget/core
-      // - https://developer.zendesk.com/embeddables/docs/widget/chat
-      // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
+        // References:
+        // - https://developer.zendesk.com/embeddables/docs/widget/core
+        // - https://developer.zendesk.com/embeddables/docs/widget/chat
+        // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
 
-      if(!startedManualChat) {
-        /* Hidden by default, show if started manual chat at least once */
-        zE('webWidget', 'hide');
-      }
+        if(!startedManualChat) {
+          /* Hidden by default, show if started manual chat at least once */
+          zE('webWidget', 'hide');
+        }
 
-      // show bot again if manual chat has ended
-      zE('webWidget:on', 'chat:end', () => {
-        localStorage.removeItem('startedManualChat');
-        zE('webWidget', 'hide');
-        window.kindlyChat.showBubble();
-      });
+        // zE('webWidget:on', 'chat:start', () => {
+        //   console.log('chat started!')
+        //   // TODO: only send bot log on chat start?
+        // });
+
+        // show bot again if manual chat has ended
+        zE('webWidget:on', 'chat:end', () => {
+          localStorage.removeItem('startedManualChat');
+          zE('webWidget', 'hide');
+          window.kindlyChat.showBubble();
+        });
     </script>
 </body>
 </html>
