@@ -95,19 +95,59 @@
 
 
     <script>
-        /* Zendesk Chat Widget settings */
-        window.zESettings = {
-            webWidget: {
-                color: { theme: '#f1a7f1' },
-                offset: {
-                    horizontal: '80px',
-                    vertical: '10px'
-                },
-                 zIndex: 999  // kindly-chat is @ z-index: 1000
+      /* Format chat log */
+      function formatChat(messages) {
+        const firstMessage = messages[0];
+        const lastMessage = messages.slice(-1)[0];
+        const header = 'Bot chat history:\n' +
+          `First message: ${firstMessage.created.slice(0, -8).replace('T', ' ')}\n` +
+          `Last message: ${lastMessage.created.slice(0, -8).replace('T', ' ')}\n` +
+          `Users language: ${firstMessage.chat_language_code}\n`;
+
+        const formattedMessages = messages
+          .map((msg) => {
+            const buttons = (msg.buttons || []).map((btn) => {
+              const uri = btn.button_type === 'link' ? btn.value : `#${btn.value}`;
+              return `${btn.label}[${uri}]`;
+            });
+            console.log(buttons);
+
+            let hourAndMinute = msg.created.slice(11, -8).replace('T', ' ');
+            return `${hourAndMinute} ${msg.from_bot ? 'Bot' : 'You'}: ${msg.message}\n${buttons.length ? `Buttons: ${buttons.join(' ')}\n` : ''}`;
+          })
+          .join('\n');
+
+        return `${header}\n${formattedMessages}`;
+      }
+      /* Zendesk Chat Widget settings */
+      window.zESettings = {
+          webWidget: {
+              color: { theme: '#f1a7f1' },
+              offset: {
+                  horizontal: '80px',
+                  vertical: '10px'
+              },
+               zIndex: 999  // kindly-chat is @ z-index: 1000
+          }
+      };
+      window.kindlyOptions = {
+        buttonHandlers: {
+          /* On takeover click open zendesk bubble */
+          takeover_request: (e, button, chatMessage, chatMessages) => {
+            console.log(e, button, chatMessage, chatMessages)
+            const displayState = zE('webWidget:get', 'display');
+            window.kindlyChat.closeChat();
+            if (displayState !== 'chat') {
+              zE('webWidget', 'show');
+              zE('webWidget', 'open');
+              zE('webWidget', 'chat:send', formatChat(chatMessages));
             }
-        };
+            return true;  // true means preventDefault for kindly-chat specific default behaviour
+          }
+        }
+      }
     </script>
-    <script id="kindly-chat" src="https://chat.kindlycdn.com/kindly-chat.js" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
+    <script id="kindly-chat" src="https://chat-dev.kindlycdn.com/kindly-chat.js?yo=lo" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
     <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ce3e09dc-df8e-4c48-bf3a-46a0c28a1bbc"></script>
     <script>
         // References:
@@ -115,43 +155,12 @@
         // - https://developer.zendesk.com/embeddables/docs/widget/chat
         // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
 
-        function botChatLog() {
-          return 'Bot chat history:\n' +
-          '22:00 Nikolai: Kan jeg kjøpe blomstr?\n' +
-          '22:00 Eclectic Flowers: Hos oss kan du kjøpe manage flotte blomster i duse pastellfarger! 💐💐💐💐\n' +
-          '22:02 Nikolai: Takk\n' +
-          '22:02 Eclectic Flowers: Ingenting å takke for! Håper du fikk svar på det du lurte på\n' +
-          '22:02 Nikolai: Forresten, hva heter Tussilago farfara på norsk?\n' +
-          '22:03 Eclectic Flowers: Nå skjønte jeg ikke. Vil du snakke med et menneske?\n' +
-          '22:03 Nikolai: Snakk med et menneske';
-        }
-
         /* Hidden by default */
-        // TODO: only run if not already shown
         zE('webWidget', 'hide');
-
-        /* On takeover click open zendesk bubble */
-        // TODO: button click API in kindly-chat
-        const takeoverButton = document.getElementById('takover-button');
-            takeoverButton.addEventListener('click', (e, button, chatMessage, chat) => {
-            e.preventDefault();
-            // TODO: get chat log
-            // TODO: send formatted chat message
-            const displayState = zE('webWidget:get', 'display');
-            console.log('displayState',displayState);
-            if(displayState !== 'chat') {
-                console.log('opening web widget');
-                zE('webWidget', 'show');
-                zE('webWidget', 'open');
-
-                zE('webWidget', 'chat:send', botChatLog());
-            }
-        });
 
         zE('webWidget:on', 'chat:start', () => {
             console.log('chat started!')
         });
-        /* On takeover end, open kindly-chat? */
     </script>
 </body>
 </html>
