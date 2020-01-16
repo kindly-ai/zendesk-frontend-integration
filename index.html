@@ -118,20 +118,20 @@
       window.zESettings = {
         webWidget: {
           color: { theme: '#f1a7f1' },
-          offset: {
-            horizontal: '80px',
-            vertical: '10px'
-          },
+          // offset: {
+          //   horizontal: '80px',
+          //   vertical: '10px'
+          // },
           // zIndex: 999  // kindly-chat is @ z-index: 1000
         }
       };
 
       // Check if manual chat has been started
-      const startedManualChat = localStorage.getItem('startedManualChat') === 'true';
+      window.startedManualChat = localStorage.getItem('startedManualChat') === 'true';
 
       /* Kindly Chat settings */
       window.kindlyOptions = {
-        bubbleHidden: startedManualChat,
+        bubbleHidden: startedManualChat,  // FIXME: does this work?
         buttonHandlers: {
           /* On takeover click open zendesk bubble */
           takeover_request: (e, button, chatMessage, chatMessages) => {
@@ -139,13 +139,15 @@
             window.kindlyChat.closeChat();
             window.kindlyChat.hideBubble();
 
+            console.log(displayState)
             if (displayState !== 'chat') {  // Do nothing if chat is already open
               localStorage.setItem('startedManualChat', "true");
+              window.startedManualChat = true;
               zE('webWidget', 'show');
               zE('webWidget', 'open');
 
               // Only send manual chat if already started
-              if(!startedManualChat) {
+              if(!window.startedManualChat) {
                 zE('webWidget', 'chat:send', formatChat(chatMessages));
               }
             }
@@ -162,15 +164,19 @@
       // - https://developer.zendesk.com/embeddables/docs/widget/chat
       // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
 
-      if(!startedManualChat) {
+      if(!window.startedManualChat) {
         /* Hidden by default, show if started manual chat at least once */
         zE('webWidget', 'hide');
       }
 
       // show bot again if manual chat has ended
       zE('webWidget:on', 'chat:end', () => {
-        localStorage.removeItem('startedManualChat');
-        zE('webWidget', 'hide');
+        // TODO: this triggers on page refresh, why?
+        console.log('chat ended');
+        const displayState = zE('webWidget:get', 'display');
+        console.log('displayState', displayState)
+        // localStorage.removeItem('startedManualChat');
+        // zE('webWidget', 'hide');
         window.kindlyChat.showBubble();
       });
     </script>
