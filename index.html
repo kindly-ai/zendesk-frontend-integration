@@ -92,8 +92,8 @@
     </div>
 
     <script>
-      /* Format chat log */
       function formatChat(messages) {
+        /** Format chat log */
         const firstMessage = messages[0];
         const lastMessage = messages.slice(-1)[0];
         const header = `Bot chat history [id: ${firstMessage.chat_id}]:\n` +
@@ -114,44 +114,50 @@
 
         return `${header}\n${formattedMessages}`;
       }
-      /* Zendesk Chat Widget settings */
+
+      // Zendesk Chat Widget settings
       window.zESettings = {
         webWidget: {
           color: { theme: '#f1a7f1' },
-          // offset: {
-          //   horizontal: '80px',
-          //   vertical: '10px'
-          // },
+          // offset: { horizontal: '80px', vertical: '10px' },
           // zIndex: 999  // kindly-chat is @ z-index: 1000
         }
       };
 
-      // Check if manual chat has been started
-      window.startedManualChat = localStorage.getItem('startedManualChat') === 'true';
+      // Check if manual chat has been started and set state
+      const STARTED_MANUAL_CHAT_AT_KEY = 'startedManualChatAt';
+      const TIMEOUT_HOURS = 1;  // Timeout after 1 hour
+      const startedManualChatAt = localStorage.getItem(STARTED_MANUAL_CHAT_AT_KEY);
+      window.startedManualChat = startedManualChatAt && (new Date() - new Date(startedManualChatAt)) / (1000 * 60 * 60) <= TIMEOUT_HOURS;
 
-      /* Kindly Chat settings */
+      // Kindly Chat settings
       window.kindlyOptions = {
-        bubbleHidden: startedManualChat,  // FIXME: does this work?
-        buttonHandlers: {
-          /* On takeover click open zendesk bubble */
-          takeover_request: (e, button, chatMessage, chatMessages) => {
-            const displayState = zE('webWidget:get', 'display');
+        bubbleHidden: startedManualChat,
+        onMessage: (newMessage, chatLog) => {
+          const isTakeoverMessageInsideBusinessHours = (
+            newMessage.sender === 'SYSTEM'
+            && newMessage.system_dialogue_category === 'takeover'
+            && newMessage.system_dialogue_message_type === 'request'
+          );
+
+          if(!isTakeoverMessageInsideBusinessHours) {
+              return;
+          }
+          // Open Zendesk Chat widget and hide Kindly Chat
+          // Do nothing if chat is already open
+          const displayState = zE('webWidget:get', 'display');
+          if (displayState !== 'chat') {
             window.kindlyChat.closeChat();
             window.kindlyChat.hideBubble();
+            localStorage.setItem(STARTED_MANUAL_CHAT_AT_KEY, new Date().toISOString());
+            window.startedManualChat = true;
+            zE('webWidget', 'show');
+            zE('webWidget', 'open');
 
-            console.log(displayState)
-            if (displayState !== 'chat') {  // Do nothing if chat is already open
-              localStorage.setItem('startedManualChat', "true");
-              window.startedManualChat = true;
-              zE('webWidget', 'show');
-              zE('webWidget', 'open');
-
-              // Only send manual chat if already started
-              if(!window.startedManualChat) {
-                zE('webWidget', 'chat:send', formatChat(chatMessages));
-              }
+            // Only send chatlog to zendesk chat if already started
+            if (window.startedManualChat) {
+              zE('webWidget', 'chat:send', formatChat(chatLog));
             }
-            return true;  // true means preventDefault for kindly-chat specific default behaviour
           }
         }
       }
@@ -164,21 +170,38 @@
       // - https://developer.zendesk.com/embeddables/docs/widget/chat
       // - https://develop.zendesk.com/hc/en-us/articles/360025618474-Quickstart-Web-Widget-JavaScript-APIs
 
+      // Hide Zendesk Chat widget by default, show if manual chat already started
       if(!window.startedManualChat) {
-        /* Hidden by default, show if started manual chat at least once */
         zE('webWidget', 'hide');
       }
 
-      // show bot again if manual chat has ended
-      zE('webWidget:on', 'chat:end', () => {
-        // TODO: this triggers on page refresh, why?
-        console.log('chat ended');
-        const displayState = zE('webWidget:get', 'display');
-        console.log('displayState', displayState)
-        // localStorage.removeItem('startedManualChat');
-        // zE('webWidget', 'hide');
-        window.kindlyChat.showBubble();
+      // Hide Zendesk Chat widget and shows bot again (attach handler after Zendesk Chat widget has connected)
+      zE('webWidget:on', 'chat:connected', function() {
+        zE('webWidget:on', 'chat:end', () => {
+          localStorage.removeItem(STARTED_MANUAL_CHAT_AT_KEY);
+          zE('webWidget', 'hide');
+          window.kindlyChat.showBubble();
+        });
       });
+
+      // zE('webWidget:on', 'chat:status', function(status) {
+      //   console.log('chat:status', status);
+      // });
+
+      // zE('webWidget:on', 'chat:departmentStatus', function(department) {
+      //   console.log('chat:departmentStatus', department);
+      // });
+
+      // const zendeskIsChatting = zE('webWidget:get', 'chat:isChatting');
+
+      // const departments = zE('webWidget:get', 'chat:departments');
+      // departments.forEach(department => {
+      //   console.log(department);
+      // });
+
+      // zE('webWidget:on', 'chat:start', () => {
+      //   console.log('chat:start');
+      // });
     </script>
 </body>
 </html>
