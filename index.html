@@ -91,36 +91,34 @@
 
     <script>
       function formatChat(messages) {
-        /** Format chat log */
+        /** Prepare Kindly chat log for Zendesk Chat */
         const firstMessage = messages[0];
         const lastMessage = messages.slice(-1)[0];
-        const header = `Bot chat history [id: ${firstMessage.chat_id}]:\n` +
-          `First message: ${firstMessage.created.slice(0, -8).replace('T', ' ')}\n` +
-          `Last message: ${lastMessage.created.slice(0, -8).replace('T', ' ')}\n` +
-          `Users language: ${firstMessage.chat_language_code}\n`;
+        const header = 'Bot chat history [id: ' + firstMessage.chat_id + ']:\n' +
+          'First message: ' + firstMessage.created.slice(0, -8).replace('T', ' ') + '\n' +
+          'Last message: ' + lastMessage.created.slice(0, -8).replace('T', ' ')  + '\n' +
+          'Users language: ' + firstMessage.chat_language_code + '\n';
 
         const formattedMessages = messages
-          .map((msg) => {
-            const buttons = (msg.buttons || []).map((btn) => {
-              const uri = btn.button_type === 'link' ? btn.value : `#${btn.value}`;
-              return `${btn.label}[${uri}]`;
+          .map(function (msg) {
+            const buttons = (msg.buttons || []).map(function(btn) {
+              const uri = btn.button_type === 'link' ? btn.value : '#' + btn.value;
+              return btn.label + '[' + uri + ']';
             });
             let hourAndMinute = msg.created.slice(11, -8).replace('T', ' ');
-            return `${hourAndMinute} ${msg.from_bot ? 'Bot' : 'You'}: ${msg.message}\n${buttons.length ? `Buttons: ${buttons.join(' ')}\n` : ''}`;
+            return hourAndMinute + ' ' + msg.from_bot ? 'Bot' : 'You' + ': ' + msg.message + '\n' + buttons.length ? 'Buttons: ' + buttons.join(' ') + '\n' : '';
           })
           .join('\n');
 
-        return `${header}\n${formattedMessages}`;
+        return header + '\n' + formattedMessages;
       }
 
       // Zendesk Chat Widget settings
-      window.zESettings = {
+      /*window.zESettings = {
         webWidget: {
           color: { theme: '#f1a7f1' },
-          // offset: { horizontal: '80px', vertical: '10px' },
-          // zIndex: 999  // kindly-chat is @ z-index: 1000
         }
-      };
+      };*/
 
       // Check if manual chat has been started and set state
       const STARTED_MANUAL_CHAT_AT_KEY = 'startedManualChatAt';
@@ -131,31 +129,32 @@
       // Kindly Chat settings
       window.kindlyOptions = {
         bubbleHidden: startedManualChat,
-        onMessage: (newMessage, chatLog) => {
+        onMessage: function (newMessage, chatLog) {
           const isTakeoverMessageInsideBusinessHours = (
             newMessage.sender === 'SYSTEM'
             && newMessage.system_dialogue_category === 'takeover'
             && newMessage.system_dialogue_message_type === 'request'
           );
-
-          if(!isTakeoverMessageInsideBusinessHours) {
-              return;
-          }
-          // Open Zendesk Chat widget and hide Kindly Chat
-          // Do nothing if chat is already open
           const displayState = zE('webWidget:get', 'display');
-          if (displayState !== 'chat') {
-            window.kindlyChat.closeChat();
-            window.kindlyChat.hideBubble();
-            localStorage.setItem(STARTED_MANUAL_CHAT_AT_KEY, new Date().toISOString());
-            window.startedManualChat = true;
-            zE('webWidget', 'show');
-            zE('webWidget', 'open');
 
-            // Only send chatlog to zendesk chat if already started
-            if (window.startedManualChat) {
-              zE('webWidget', 'chat:send', formatChat(chatLog));
-            }
+          if(!isTakeoverMessageInsideBusinessHours || displayState == 'chat') {
+            // Dont open zendesk chat if either
+            // A: outside business hours
+            // B: Zendesk chat is already open
+            return;
+          }
+
+          // Close Kindly Chat, open Zendesk Chat
+          window.kindlyChat.closeChat();
+          window.kindlyChat.hideBubble();
+          localStorage.setItem(STARTED_MANUAL_CHAT_AT_KEY, new Date().toISOString());
+          window.startedManualChat = true;
+          zE('webWidget', 'show');
+          zE('webWidget', 'open');
+
+          // Send chatlog to zendesk chat
+          if (window.startedManualChat) {
+            zE('webWidget', 'chat:send', formatChat(chatLog));
           }
         }
       }
@@ -163,6 +162,8 @@
     <script id="kindly-chat" src="https://chat.kindlycdn.com/kindly-chat.js?hi=1" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
     <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ce3e09dc-df8e-4c48-bf3a-46a0c28a1bbc"></script>
     <script>
+      // Initiate Zendesk Chat
+
       // References:
       // - https://developer.zendesk.com/embeddables/docs/widget/core
       // - https://developer.zendesk.com/embeddables/docs/widget/chat
@@ -173,14 +174,17 @@
         zE('webWidget', 'hide');
       }
 
-      // Hide Zendesk Chat widget and shows bot again (attach handler after Zendesk Chat widget has connected)
+      // Hide Zendesk Chat widget and shows bot again
+      // attach handler after Zendesk Chat widget has connected
       zE('webWidget:on', 'chat:connected', function() {
-        zE('webWidget:on', 'chat:end', () => {
+        zE('webWidget:on', 'chat:end', function () {
+          // delete manual chat start timestamp
           localStorage.removeItem(STARTED_MANUAL_CHAT_AT_KEY);
           zE('webWidget', 'hide');
           window.kindlyChat.showBubble();
         });
       });
     </script>
+
 </body>
 </html>
