@@ -98,18 +98,18 @@
           'First message: ' + firstMessage.created.slice(0, -8).replace('T', ' ') + '\n' +
           'Last message: ' + lastMessage.created.slice(0, -8).replace('T', ' ')  + '\n' +
           'Users language: ' + firstMessage.chat_language_code + '\n';
-
         const formattedMessages = messages
           .map(function (msg) {
             const buttons = (msg.buttons || []).map(function(btn) {
               const uri = btn.button_type === 'link' ? btn.value : '#' + btn.value;
               return btn.label + '[' + uri + ']';
             });
-            let hourAndMinute = msg.created.slice(11, -8).replace('T', ' ');
-            return hourAndMinute + ' ' + msg.from_bot ? 'Bot' : 'You' + ': ' + msg.message + '\n' + buttons.length ? 'Buttons: ' + buttons.join(' ') + '\n' : '';
+            const formattedButtons = buttons.length ? 'Buttons: ' + buttons.join(' ') + '\n' : '';
+            const hourAndMinute = msg.created.slice(11, -8).replace('T', ' ');
+            const from = msg.from_bot ? 'Bot' : 'You';
+            return hourAndMinute + ' ' + from + ': ' + msg.message + '\n' + formattedButtons;
           })
           .join('\n');
-
         return header + '\n' + formattedMessages;
       }
 
