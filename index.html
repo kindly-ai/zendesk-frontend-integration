@@ -89,9 +89,10 @@
         </div>
     </div>
 
+    <!-- EXAMPLE start -->
     <script>
+      /** Prepare Kindly chat log for Zendesk Chat */
       function formatChat(messages) {
-        /** Prepare Kindly chat log for Zendesk Chat */
         const firstMessage = messages[0];
         const lastMessage = messages.slice(-1)[0];
         const header = 'Bot chat history [id: ' + firstMessage.chat_id + ']:\n' +
@@ -114,11 +115,27 @@
       }
 
       // Zendesk Chat Widget settings
-      /*window.zESettings = {
+      // Here we suppress help center, talk and answer bot when kindly chat is loaded.
+      window.zESettings = {
         webWidget: {
-          color: { theme: '#f1a7f1' },
+          chat: {
+            suppress: false,
+            hideWhenOffline: false
+          },
+          contactForm: {
+            suppress: false
+          },
+          helpCenter: {
+            suppress: true
+          },
+          talk: {
+            suppress: true
+          },
+          answerBot: {
+            suppress: true
+          }
         }
-      };*/
+      };
 
       // Check if manual chat has been started and set state
       const STARTED_MANUAL_CHAT_AT_KEY = 'startedManualChatAt';
@@ -137,7 +154,7 @@
           );
           const displayState = zE('webWidget:get', 'display');
 
-          if(!isTakeoverMessageInsideBusinessHours || displayState == 'chat') {
+          if(!isTakeoverMessageInsideBusinessHours || displayState === 'chat') {
             // Dont open zendesk chat if either
             // A: outside business hours
             // B: Zendesk chat is already open
@@ -159,11 +176,11 @@
         }
       }
     </script>
-    <script id="kindly-chat" src="https://chat.kindlycdn.com/kindly-chat.js?hi=1" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
+    <!-- TODO: Replace data-bot-key with your Kindly bot key and the ?key= param value with your Zendesk Chat key -->
+    <script id="kindly-chat" src="https://chat.kindlycdn.com/kindly-chat.js" data-bot-key="99de928b-898d-4f6c-a216-1098eb1154f7" async></script>
     <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ce3e09dc-df8e-4c48-bf3a-46a0c28a1bbc"></script>
     <script>
-      // Initiate Zendesk Chat
-
+      // Initialize Zendesk Chat
       // References:
       // - https://developer.zendesk.com/embeddables/docs/widget/core
       // - https://developer.zendesk.com/embeddables/docs/widget/chat
@@ -185,6 +202,7 @@
         });
       });
     </script>
+    <!-- EXAMPLE end -->
 
 </body>
 </html>
